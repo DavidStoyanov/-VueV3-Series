@@ -1,43 +1,48 @@
 <template>
   <div class="home">
-
-    <h1>Home</h1>
-
-    <div>
-      <h2>Refs</h2>
-      <p>My name is {{ nameRef.name }}</p>
-      <button @click="changeNameRef">Update name ref</button>
-    </div>
-
-    <div>
-      <h2>Reactive</h2>
-      <p>My name is {{ nameReactive.name }}</p>
-      <button @click="changeNameReactive">Update name reactive</button>
-    </div>
-
+    <br>
+    <input v-model="search" type="text">
+    <p>Searching for: {{ search }}</p>
+    <b></b>
+    <span v-for="name in matchingNames" :key="name">
+      {{ name }}
+    </span>
     <br>
   </div>
 </template>
 
 <script>
-import { ref, reactive } from '@vue/reactivity'
+import { ref } from '@vue/reactivity'
+import { computed, watch, watchEffect } from '@vue/runtime-core'
 
 export default {
   name: 'HomeView',
   setup() {
-    let nameRef = ref({name: 'mario'})
-    let nameReactive = reactive({name: 'mario'})
+    let search = ref('')
+    let names = ref(['mario', 'ted', 'ped', 'led', 'smet'])
 
-    const changeNameRef = () => {
-      nameRef.value.name = 'Another One'
-    }
+    watch(search, () => {
+      console.log('watch function ran')
+    }) 
 
-    const changeNameReactive = () => {
-      // Doesn't work with primitive values/ only referent
-      nameReactive.name = 'Another One'
-    }
+    watchEffect(() => {
+      console.log('watchEffect function ran', search.value)
+    })
 
-    return { nameRef, nameReactive, changeNameRef, changeNameReactive }
+    const matchingNames = computed(() => {
+      return names.value.filter(x => x.includes(search.value))
+    })
+
+    return { names, search, matchingNames }
   }
 }
 </script>
+
+<style>
+  span {
+    display: inline-block;
+    border: 1px solid #000;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0.3rem;
+  }
+</style>
